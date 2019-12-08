@@ -60,5 +60,11 @@ class neural_network:
         d2x = tf.gradients(self.dx(X),X)
         return d2x[0]
 
-    def compute_lu(self, X, d2g, d, d2d, d1d):
-        return d2g + (d2d * self.value(X)) + (2 * d1d * self.dx(X)) + (d * self.d2x(X))
+    def compute_lu(self, X, d2g, d, d2d, d1d, ret):
+        d1_x = self.dx(X)
+        d2_x = self.d2x(X)
+        x_val = self.value(X)
+        for it in range(d2g.shape[1]):
+            ret += tf.expand_dims(d2g[:, it], -1) + tf.multiply(tf.expand_dims(d2d[:, it], -1), x_val) + (2 * tf.multiply(tf.expand_dims(d1d[:, it], -1), tf.expand_dims(d1_x[:, it], -1))) + tf.multiply(d, tf.expand_dims(d2_x[:, it], -1))
+
+        return ret
